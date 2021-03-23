@@ -1,0 +1,59 @@
+<form [formGroup]="selectForm" (ngSubmit)="onSubmit()">
+    
+    <!-- DATA -->
+
+    <div *ngFor="let type of dataType">
+  
+  
+    <input formControlName="dataType" name="dataType" type="radio"
+           class="form-check-input"
+           [value]="type.value"
+           [required]=true>
+  
+    <span style="font-size: 15px">{{type.value}}</span>
+  
+    </div>
+  
+  
+    <!-- ALGO -->
+
+    <div *ngFor="let type of algorithmType">
+  
+  
+      <input formControlName="algorithmType" name="algorithmType" type="radio"
+             class="form-check-input"
+             [value]="type.value"
+             [required]=true>
+  
+      <span style="font-size: 15px">{{type.value}}</span>
+  
+    </div>
+
+
+    <!-- INFRASTRUCTURE -->
+
+  
+    <div *ngFor="let type of infrastructureType">
+  
+  
+        <input formControlName="infrastructureType" name="infrastructureType" type="radio"
+               class="form-check-input"
+               [value]="type.value"
+               [required]=true>
+    
+        <span style="font-size: 15px">{{type.value}}</span>
+    
+      </div>
+
+
+      <div> 
+          <span> max Price: </span>
+          <input formControlName="maxPrice" name="maxPrice" type="number"
+          class="form-check-input"
+          [required]=true> 
+
+      </div>
+  
+    <button type="submit" class="btn btn-success btn-lg btn-block btnStyle" [disabled]="!selectForm.valid"> Valider SLA  </button>
+  </form>
+  
