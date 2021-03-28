@@ -33,7 +33,7 @@ contract Factory {
     /// @param _ipfsURI an IPFS URI to expected auction requirements
     /// @param _requirementsHash a hash of those requirements
     /// @param _duration Auction duration (in minutes)
-    /// @return deployed Auction address
+    /// @return auctionAddress deployed Auction address
     function createAuction(uint _maxPrice, string memory _currency, string memory _ipfsURI, string memory _requirementsHash, uint _duration) public returns (address auctionAddress) {
         
         uint newId = generateUniqueId();
