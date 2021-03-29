@@ -5,9 +5,7 @@ pragma experimental ABIEncoderV2;
 
 import "./Auction.sol";
 
-/// @title Factory contract for Auction deployment
-/// @author Andrea Perrichon-Chrétien & Nicolas Six
-/// @notice Only deploy this contract once (change it when using another metadata file) - use it to deploy auctions
+//Factory est un répertoire contenant toutes les Auction ==> de manière à pouvoir y accéder plus tard 
 contract Factory { 
 
     uint uniqueIdCounter = 0;
@@ -20,20 +18,13 @@ contract Factory {
 
     event auctionCreated(address auctionContract, address owner, uint auctionID);
     
-    /// @param _ontologyURI an IPFS URI to a base ontology file that describes expected requirements from the user
-    /// @notice comparison between the base ontology file and expected requirements is done off-chain; the contract only stores the reference
-    constructor(string memory _ontologyURI) {
+    
+    constructor(string memory _ontologyURI) public {
         require(bytes(_ontologyURI).length == 53, "Ontology IPFS URI must be a string of length 53 (ipfs:// + 46 char hash)");
         ontologyURI = _ontologyURI;
     }
 
-    /// @notice Creates an Auction contract and keeps + returns the address of the contract
-    /// @param _maxPrice maximum price allowed for a bid
-    /// @param _currency a currency sigle (eg. "EUR")
-    /// @param _ipfsURI an IPFS URI to expected auction requirements
-    /// @param _requirementsHash a hash of those requirements
-    /// @param _duration Auction duration (in minutes)
-    /// @return auctionAddress deployed Auction address
+    
     function createAuction(uint _maxPrice, string memory _currency, string memory _ipfsURI, string memory _requirementsHash, uint _duration) public returns (address auctionAddress) {
         
         uint newId = generateUniqueId();

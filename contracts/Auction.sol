@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity >=0.5.0 <0.8.0;
+pragma solidity >=0.5.0 <0.8.2;
 pragma experimental ABIEncoderV2;
 import "./Factory.sol";
 
@@ -24,7 +24,7 @@ contract Auction {
 
     // ARRAYS MAPPINGS
     mapping (address => Bid ) addressToBid; 
-    mapping (ProviderAsset => address[]) assetToProviders;
+    mapping (uint => address[]) assetToProviders;//Enum is converted to uint as Enum cannot be used as key
     BidHistoryPoint[] bidHistory;
     
     // ENUM
@@ -74,7 +74,7 @@ contract Auction {
     /// @param _requirementsHash a hash of those requirements
     /// @param _auctionOwner the owner of this auction (able to adjudicate)
     /// @param _duration Auction duration (in minutes)
-    constructor(uint _maxPrice, string memory _currency, string memory _requirementsURI, string memory _requirementsHash, address _auctionOwner, uint _duration) {
+    constructor(uint _maxPrice, string memory _currency, string memory _requirementsURI, string memory _requirementsHash, address _auctionOwner, uint _duration) public {
         require(bytes(_requirementsURI).length == 53, "IPFS URI must be a string of length 53 (ipfs:// + 46 char hash)");
         require(bytes(_requirementsHash).length == 64, "Requirements hash must be a string of length 64 (kekkak256(str))");
         timeAtStartContract = block.timestamp;
@@ -92,7 +92,8 @@ contract Auction {
     /// @param _pa which asset is proposed by the provider. 3 possibilities defined in the corresponding enum.
     function placeBid(uint _price, ProviderAsset _pa) public notFinished { 
         require (!addressToBid[msg.sender].exists, "Bid already exists.");
-        if(assetToProviders[_pa].length > 0) {
+        uint pId = uint(_pa);
+        if(assetToProviders[pId].length > 0) {
             (,uint lowestBid) = getAssetWinner(_pa);
             require(lowestBid > _price, "A better bid already exists.");
         }
@@ -105,7 +106,7 @@ contract Auction {
             true
         );
         addressToBid[msg.sender] = firstBid;
-        assetToProviders[_pa].push(msg.sender);
+        assetToProviders[pId].push(msg.sender);
         bidHistory.push(BidHistoryPoint(_price, _pa, msg.sender));
     }
         
@@ -122,13 +123,14 @@ contract Auction {
     /// @param _pa the asset in question    
     function getAssetWinner(ProviderAsset _pa) public view returns(address, uint) {
         uint lowestBid;
+        uint pId = uint(_pa);
         address lowestAddress;
         
-        require(assetToProviders[_pa].length > 0, "No providers yet for provided data type.");
-        lowestBid = addressToBid[assetToProviders[_pa][0]].price;
-        lowestAddress = addressToBid[assetToProviders[_pa][0]].ownerBid;
-        for (uint i = 0; i < assetToProviders[_pa].length; i++) {
-            Bid memory _bid = addressToBid[assetToProviders[_pa][i]];
+        require(assetToProviders[pId].length > 0, "No providers yet for provided data type.");
+        lowestBid = addressToBid[assetToProviders[pId][0]].price;
+        lowestAddress = addressToBid[assetToProviders[pId][0]].ownerBid;
+        for (uint i = 0; i < assetToProviders[pId].length; i++) {
+            Bid memory _bid = addressToBid[assetToProviders[pId][i]];
             if(_bid.price < lowestBid) {
                 lowestBid = _bid.price;
                 lowestAddress = _bid.ownerBid;
@@ -165,7 +167,7 @@ contract Auction {
     /// @return Winners of the auction, as a struct
     function adjudicate() public isOwnerOfContract returns (Winners memory) { //terminer l'enchère + set winnerAuction + transfer funds 
         require(currentState != AuctionStatus.Finished, "Auction is already finished.");
-        require(block.timestamp > timeAtStartContract + duration, "Adjudication cannot be performed yet (no timeout).");
+        //require(block.timestamp > timeAtStartContract + duration, "Adjudication cannot be performed yet (no timeout).");
         currentState = AuctionStatus.Finished; //Finish Auction
         Winners memory finalWinners = getCurrentWinners();
         winners = finalWinners;

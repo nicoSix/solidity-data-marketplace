@@ -1,0 +1,9 @@
+Perform those commands in truffle console after executing truffle compile && truffle migrate --network development (make sure that Ganache is up)
+
+var myFactory = await Factory.deployed()
+var res = await myFactory.createAuction(100, "EUR", "ipfs://Qme6Kkjrs2LQfQj7BMHGtM62P5inHhDhBiMwPK3TLFyAHh","680ffed756997a30b00925b6b087d2239430495cadfd71b388bd3df0db520c69", 15)
+var myAuction = await Auction.at("<<<new address>>>")
+var res = await myAuction.placeBid(90, 0, {from: accounts[0]})
+var res = await myAuction.placeBid(90, 1, {from: accounts[1]})
+var res = await myAuction.placeBid(90, 2, {from: accounts[2]})
+var res = await myAuction.adjudicate.estimateGas({from: accounts[0]})
